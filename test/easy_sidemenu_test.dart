@@ -6,20 +6,59 @@ import 'package:easy_sidemenu/src/side_menu_style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-final controller = SideMenuController();
-
-const compactWidth = 64.0;
+var globalSideMenuController = SideMenuController();
+var globalSideMenuStyle = SideMenuStyle();
 
 void main() {
   /// This is a regression test for https://github.com/Jamalianpour/easy_sidemenu/issues/46
   testWidgets(
       'When displayMode is "compact", the width is correct after building the widget twice',
       (tester) async {
+    // Initialize controller
+    globalSideMenuController = SideMenuController();
+    globalSideMenuStyle = SideMenuStyle(
+        displayMode: SideMenuDisplayMode.compact,);
+
     await tester.pumpWidget(const TestApp());
 
     final firstWidth = tester.getSize(find.byType(AnimatedContainer)).width;
 
-    expect(firstWidth, equals(compactWidth));
+    expect(firstWidth, equals(globalSideMenuStyle.compactSideMenuWidth));
+
+    await tester.tap(find.byType(SideMenuItem));
+
+    // Wait for navigation
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(ElevatedButton));
+
+    // Wait for navigation, again
+    await tester.pumpAndSettle();
+
+    final secondWidth = tester.getSize(find.byType(AnimatedContainer)).width;
+
+    expect(firstWidth, equals(secondWidth));
+
+    // These two avoid the exception 'A Timer is still pending even after the
+    // widget tree was disposed.'
+    await tester.pumpWidget(const Placeholder());
+    await tester.pump(const Duration(seconds: 1));
+  });
+
+  /// This is a regression test for https://github.com/Jamalianpour/easy_sidemenu/issues/46
+  testWidgets(
+      'When displayMode is "open", the width is correct after building the widget twice',
+      (tester) async {
+    // Initialize controller
+    globalSideMenuController = SideMenuController();
+    globalSideMenuStyle = SideMenuStyle(
+        displayMode: SideMenuDisplayMode.open);
+
+    await tester.pumpWidget(const TestApp());
+
+    final firstWidth = tester.getSize(find.byType(AnimatedContainer)).width;
+
+    expect(firstWidth, globalSideMenuStyle.openSideMenuWidth);
 
     await tester.tap(find.byType(SideMenuItem));
 
@@ -68,9 +107,10 @@ class FirstPage extends StatelessWidget {
           Row(
             children: [
               SideMenu(
-                controller: controller,
+                controller: globalSideMenuController,
                 items: [
                   SideMenuItem(
+                    title: 'Go to Page 2',
                     priority: 0,
                     icon: const Icon(Icons.send),
                     onTap: (_, __) {
@@ -79,9 +119,7 @@ class FirstPage extends StatelessWidget {
                     },
                   )
                 ],
-                style: SideMenuStyle(
-                    displayMode: SideMenuDisplayMode.compact,
-                    compactSideMenuWidth: compactWidth),
+                style: globalSideMenuStyle,
               ),
             ],
           )

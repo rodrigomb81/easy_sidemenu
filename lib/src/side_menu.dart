@@ -94,39 +94,53 @@ class _SideMenuState extends State<SideMenu> {
   /// Set [SideMenu] width according to displayMode and notify parent widget
   double _widthSize(SideMenuDisplayMode mode, BuildContext context) {
     if (mode == SideMenuDisplayMode.auto) {
-      if (MediaQuery.of(context).size.width > collapseWidth &&
-          Global.displayModeState.value != SideMenuDisplayMode.open) {
+      final shouldOpenMenu =
+          MediaQuery.of(context).size.width > collapseWidth &&
+              Global.displayModeState.value != SideMenuDisplayMode.open;
+
+      if (shouldOpenMenu) {
         Global.displayModeState.change(SideMenuDisplayMode.open);
+
         _notifyParent();
+
         Future.delayed(_toggleDuration(), () {
           Global.showTrailing = true;
           for (var update in Global.itemsUpdate) {
             update();
           }
         });
+
         return Global.style.openSideMenuWidth ?? 300;
       }
-      if (MediaQuery.of(context).size.width <= collapseWidth &&
-          Global.displayModeState.value != SideMenuDisplayMode.compact) {
+
+      final shouldCollapse =
+          MediaQuery.of(context).size.width <= collapseWidth &&
+              Global.displayModeState.value != SideMenuDisplayMode.compact;
+
+      if (shouldCollapse) {
         Global.displayModeState.change(SideMenuDisplayMode.compact);
         _notifyParent();
         Global.showTrailing = false;
         return Global.style.compactSideMenuWidth ?? 50;
       }
+
       return _currentWidth;
-    } else if (mode == SideMenuDisplayMode.open &&
-        Global.displayModeState.value != SideMenuDisplayMode.open) {
-      Global.displayModeState.change(SideMenuDisplayMode.open);
-      Future.delayed(_toggleDuration(), () {
-        Global.showTrailing = true;
-        for (var update in Global.itemsUpdate) {
-          update();
-        }
-      });
-      _notifyParent();
+    }
+
+    if (mode == SideMenuDisplayMode.open) {
+      if (Global.displayModeState.value != SideMenuDisplayMode.open) {
+        Global.displayModeState.change(SideMenuDisplayMode.open);
+        Future.delayed(_toggleDuration(), () {
+          Global.showTrailing = true;
+          for (var update in Global.itemsUpdate) {
+            update();
+          }
+        });
+        _notifyParent();
+      }
       return Global.style.openSideMenuWidth ?? 300;
     }
-    
+
     if (mode == SideMenuDisplayMode.compact) {
       if (Global.displayModeState.value != SideMenuDisplayMode.compact) {
         Global.displayModeState.change(SideMenuDisplayMode.compact);
