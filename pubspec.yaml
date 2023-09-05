@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  badges: 3.0.2
+  badges: ^3.0.2
 
 dev_dependencies:
   flutter_test:
