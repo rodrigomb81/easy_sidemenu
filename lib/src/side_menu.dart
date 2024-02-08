@@ -1,5 +1,4 @@
 import 'package:easy_sidemenu/src/side_menu_display_mode.dart';
-import 'package:easy_sidemenu/src/side_menu_item.dart';
 import 'package:easy_sidemenu/src/side_menu_style.dart';
 import 'package:easy_sidemenu/src/side_menu_toggle.dart';
 import 'package:flutter/material.dart';
@@ -10,8 +9,8 @@ class SideMenu extends StatefulWidget {
   /// Page controller to control [PageView] widget
   final SideMenuController controller;
 
-  /// List of [SideMenuItem] to show them on [SideMenu]
-  final List<SideMenuItem> items;
+  /// List of [Widget] to show them on [SideMenu]
+  final List<Widget> items;
 
   /// Title widget will shows on top of all items,
   /// it can be a logo or a Title text
@@ -176,7 +175,6 @@ class _SideMenuState extends State<SideMenu> {
   @override
   Widget build(BuildContext context) {
     Global.controller = widget.controller;
-    widget.items.sort((a, b) => a.priority.compareTo(b.priority));
     Global.style = widget.style ?? SideMenuStyle();
     _currentWidth = _widthSize(
         Global.style.displayMode ?? SideMenuDisplayMode.auto, context);
